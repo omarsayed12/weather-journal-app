@@ -2,13 +2,16 @@
 projectData = {};
 
 // define port
-let port = 6000;
+const port = 6000;
+
+// define apiKey
+const apiKey = "53ae82c31077a4094f497681c08c4e94";
 
 // Require Express to run server and routes
 const express = require("express");
 
 // Start up an instance of app
-const app = express(); 
+const app = express();
 
 /* Middleware*/
 
