@@ -1,6 +1,10 @@
 /* Global Variables */
 
 let zipCode = document.getElementById('zip');
+let textfeelings = document.querySelector('#feelings');
+let date = document.querySelector('#date');
+let temperature = document.querySelector('#temp');
+let content = document.querySelector('#content');
 
 // Create a new date instance dynamically with JS
 let d = new Date();
@@ -12,19 +16,24 @@ let btnGenerat = document.getElementById('generate');
 
 btnGenerat.addEventListener("click", clickGenerate)
 
-// Function to Genarate api
-
+// Function to Generate api
 async function clickGenerate() {
-    let textfeelings = document.querySelector('#feelings').value;
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode.value},&appid=${apiKey}`;
+
     const responseData = await fetch(apiUrl);
+    const data = await responseData.json();
+    const temp = data.main.temp;
 
-    let data = await responseData.json();
-    let temp = data.main.temp;
     console.log(temp);
-    // console.log(textfeelings.value);
 
-    await fetch('/postWeatherData', {
+    const allDataRes = await postData(data, temp, textfeelings);
+    const finalGetData = await generatGetData();
+    updateUiData(finalGetData);
+}
+
+// async function to post data
+async function postData(data, temp, feelings){
+     await fetch('/postWeatherData', {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -32,31 +41,22 @@ async function clickGenerate() {
         body: JSON.stringify({
             data: newDate,
             temp: temp,
-            feelings: textfeelings
+            feelings: textfeelings.value
         })
     });
+}
 
+// async function to get data
+async function generatGetData() {
     const getData = await fetch('/getWeatherData');
     const allDataRes = await getData.json();
     console.log(allDataRes);
+    return allDataRes;
 }
 
-
-    // await fetch('/postWeatherData', {
-    //     method: "POST",
-    //     headers: {
-    //         "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify({
-    //         data: newDate,
-    //         temp: temp,
-    //         textfeelings: textfeelings.value
-    //     })
-    // });
-
-    // const getData = await fetch('/getWeatherData');
-    // const x = getData.json();
-    // console.log(x);
-
-
-
+// Updating UI with new data
+const updateUiData = function uiData(data) {
+    date.innerHTML = data.data;
+    temp.innerHTML = data.temp;
+    content.innerHTML = data.feelings;
+}
